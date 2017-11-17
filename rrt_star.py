@@ -2,6 +2,7 @@ import numpy as np
 import networkx as nx
 from utils import *
 from commons import *
+from tqdm import tqdm
 
 """performance is deeply affected by granularity, d_threshold and ball radius, so choose the values according to the 
 use case > more ball_radius = better path and more computation time > less granularity = finer check for collision 
@@ -21,9 +22,10 @@ def apply_rrt_star(space_region, starting_state, target_region, obstacle_map, n_
     # cost for each vertex
     cost = {starting_state: 0}
 
+    # calculate constant factor
     gamma = 1 + np.power(2, space_dim) * (1 + 1.0 / space_dim) * get_free_area(space_region, obstacle_map)
 
-    for i in range(n_samples):
+    for i in tqdm(range(n_samples)):
 
         # select node to expand
         m_g, random_point = select_node_to_expand(tree, space_region)

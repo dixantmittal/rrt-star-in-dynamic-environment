@@ -2,6 +2,7 @@ import numpy as np
 import networkx as nx
 from utils import *
 from commons import *
+from tqdm import tqdm
 
 
 def apply_rrt(space_region, starting_state, target_region, obstacle_map, granularity=0.1, d_threshold=0.5,
@@ -13,7 +14,7 @@ def apply_rrt(space_region, starting_state, target_region, obstacle_map, granula
 
     min_cost = None
 
-    for i in range(n_samples):
+    for i in tqdm(range(n_samples)):
         # select node to expand
         m_g, random_point = select_node_to_expand(tree, space_region)
 
