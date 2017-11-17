@@ -21,9 +21,9 @@ def plot(graph, start_state, end_state, target_region, obstacle_map, title, id, 
         edges = list(graph.edges)
         for edge in edges:
             edge = np.array(edge).transpose()
-            plt.plot(edge[0, :2], edge[1, :2], 'c-', edge[0], edge[1], 'bo', ms=1)
+            plt.plot(edge[0, :2], edge[1, :2], 'c-', edge[0], edge[1], 'bo', ms=1,label='Sampled Points')
     else:
-        plt.plot(nodes[:, 0], nodes[:, 1], 'bo', ms=1)
+        plt.plot(nodes[:, 0], nodes[:, 1], 'bo', ms=1, label='Sampled Points')
 
     if end_state is not None:
         path = nx.shortest_path(graph, start_state, end_state)

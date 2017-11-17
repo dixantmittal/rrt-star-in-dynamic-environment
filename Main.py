@@ -8,9 +8,9 @@ import time
 from plotter import *
 
 space_region = ((0, 0, 0), (200, 200, 360))
-obstacle = get_random_obstacles(10, space_region)
+obstacle = get_random_obstacles(5, space_region)
 
-start = get_random_initial_state(3, space_region, obstacle)
+start = get_random_initial_state(space_region, obstacle)
 target = get_random_target_state(space_region, obstacle)
 
 # print('Starting RRT*')
@@ -30,8 +30,8 @@ rrt_nh, rrt_nh_final_state = apply_rrt_nh(space_region=space_region,
                                           starting_state=start,
                                           target_region=target,
                                           obstacle_map=obstacle,
-                                          dt=10,
-                                          n_samples=500,
+                                          dt=0.1,
+                                          n_samples=5000,
                                           granularity=1)
 print('total time taken: ', datetime.now() - t)
 
