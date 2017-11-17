@@ -2,30 +2,20 @@ import numpy as np
 from parameters import *
 
 
-def acceleration_and_steering_angle():
-    min_acc, max_acc = ACCELERATION_RANGE
-    min_steer, max_steer = STEERING_RANGE
-
-    acc = np.random.randn()
-
-    if acc >= 0:
-        acc = acc * max_acc
-    else:
-        acc = acc * min_acc
-
-    steer = np.random.rand()
-
-    if steer >= 0:
-        steer = steer * max_steer
-    else:
-        steer = steer * min_steer
-
-    return (acc, steer)
-
-
 def velocity_and_steering_angle():
     v_min, v_max = VELOCITY_RANGE
-    steer_min, steer_max = STEERING_RANGE
+    steer_left_max, steer_right_max = STEERING_RANGE
+
+    if TURN == 'left':
+        possible_steer = np.arange(steer_left_max + 1)
+        bias = np.ones(int(np.ceil(len(possible_steer) / 2))) * 4
+        bias = np.hstack((bias, np.ones(int(np.floor(len(possible_steer) / 2))) * 1))
+        bias = bias / np.sum(bias)
+
+    else:
+        possible_steer = np.arange(steer_right_max + 1) - steer_right_max
+        bias = np.ones(steer_right_max + 1)
+        bias = bias / np.sum(bias)
 
     # sample a velocity
     v = np.random.randn()
@@ -35,12 +25,7 @@ def velocity_and_steering_angle():
     else:
         v = v * v_min
 
-    # sample a steering angle
-    steer = np.random.rand()
-
-    if steer >= 0:
-        steer = steer * steer_max
-    else:
-        steer = steer * steer_min
+    # sample a discrete steering angle
+    steer = np.random.choice(possible_steer, p=bias)
 
     return (v, steer)

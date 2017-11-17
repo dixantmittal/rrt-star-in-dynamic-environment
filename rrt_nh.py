@@ -16,6 +16,11 @@ def apply_rrt_nh(space_region, starting_state, target_region, obstacle_map, gran
 
     min_cost = None
 
+    # TODO
+    # > expand obstacles for car
+    # > add padding for velocity
+
+
     for i in tqdm(range((n_samples))):
         # select node to expand
         m_g, random_point = select_node_to_expand(tree, space_region)
