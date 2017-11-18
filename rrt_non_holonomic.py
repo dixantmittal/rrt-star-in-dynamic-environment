@@ -7,8 +7,8 @@ from state_generators import *
 from tqdm import tqdm
 
 
-def apply_rrt_nh(space_region, starting_state, target_region, obstacle_map, granularity=0.1, dt=0.5,
-                 n_samples=1000, find_optimal=True):
+def apply_rrt_nh(space_region, starting_state, target_region, fixed_obstacles, dynamic_obstacles=None, granularity=0.1,
+                 dt=0.5, n_samples=1000, find_optimal=True):
     tree = nx.DiGraph()
     tree.add_node(starting_state)
 
@@ -21,7 +21,7 @@ def apply_rrt_nh(space_region, starting_state, target_region, obstacle_map, gran
     # TODO
     # > expand obstacles for car
     # > add padding for velocity
-
+    fixed_obstacles = add_padding(fixed_obstacles)
 
     for i in tqdm(range((n_samples))):
         # select node to expand
@@ -36,7 +36,7 @@ def apply_rrt_nh(space_region, starting_state, target_region, obstacle_map, gran
             continue
 
         # check if path between(m_g,m_new) defined by motion-model is collision free
-        is_free = is_collision_free(m_g, m_new, obstacle_map, granularity)
+        is_free = is_collision_free(m_g, m_new, fixed_obstacles, dynamic_obstacles)
 
         # if path is free, add new node to tree
         if is_free:

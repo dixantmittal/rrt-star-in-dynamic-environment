@@ -1,4 +1,5 @@
 import numpy as np
+from parameters import *
 
 volume_of_unit_ball = {
     1: 2,
@@ -63,7 +64,7 @@ def cartesian_distance(x, y):
     return dist
 
 
-def is_obstacle_space(point, obstacle_map):
+def is_fixed_obstacle_space(point, obstacle_map):
     if obstacle_map is None:
         return False
 
@@ -73,33 +74,41 @@ def is_obstacle_space(point, obstacle_map):
     return False
 
 
-def is_collision_free(x, y, obstacle_map, granularity):
+def is_dynamic_obstacle_space(y, obstacle_map):
+    if obstacle_map is None:
+        return False
+
+    # for key in obstacle_map.keys():
+    #     if lies_in_area(point, obstacle_map[key]):
+    #         return True
+    return False
+
+
+def is_collision_free(x, y, fixed_obstacles, dynamic_obstacles):
     if collision_cache.get(y, False):
         return False
 
-    if is_obstacle_space(y, obstacle_map):
+    if is_fixed_obstacle_space(y, fixed_obstacles):
         collision_cache[y] = True
         return False
 
-    x = np.array(x)
-    y = np.array(y)
-    d = np.asscalar(cartesian_distance(x, y))
-    unit_vector = (y - x) / d
-    floor = int(np.floor(d / granularity))
-    for i in range(floor):
-        _m = x + i * granularity * unit_vector
-
-        if collision_cache.get(tuple(_m), False):
-            return False
-
-        # can be skipped as the hit ratio is not that much, so time for cache checking adds up
-        if free_space_cache.get(tuple(_m), False):
-            continue
-
-        if is_obstacle_space(_m, obstacle_map):
-            collision_cache[tuple(_m)] = True
-            return False
-
-        free_space_cache[tuple(_m)] = True
+    if is_dynamic_obstacle_space(y, dynamic_obstacles):
+        collision_cache[y] = True
+        return False
 
     return True
+
+
+def add_padding(obstacle_map):
+    max_dim = np.max(CAR_AXIS)
+    for key in obstacle_map.keys():
+        (x, y, c, s, t), (x_range, y_range, c_range, s_range, t_range) = obstacle_map[key]
+        x = x - max_dim
+        y = y - max_dim
+
+        x_range = x_range + 2 * max_dim
+        y_range = y_range + 2 * max_dim
+
+        obstacle_map[key] = ((x, y, c, s, t), (x_range, y_range, c_range, y_range, t_range))
+
+    return obstacle_map
