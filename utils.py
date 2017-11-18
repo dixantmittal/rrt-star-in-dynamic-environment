@@ -74,17 +74,35 @@ def is_fixed_obstacle_space(point, obstacle_map):
     return False
 
 
-def is_dynamic_obstacle_space(y, obstacle_map):
+def is_dynamic_obstacle_space(point, obstacle_map, dt):
+    max_dim = np.max(CAR_AXIS)
     if obstacle_map is None:
         return False
 
-    # for key in obstacle_map.keys():
-    #     if lies_in_area(point, obstacle_map[key]):
-    #         return True
+    t = point[4]
+
+    cars_before = obstacle_map[np.round(t - dt, 1)]
+    cars_after = obstacle_map[np.round(t + dt, 1)]
+
+    # for simplicity, we will take position of car at t-dt,t,d+dt and treat complete area as obstacle
+    for i in range(len(cars_before)):
+        x1, y, theta = cars_before[i]
+        x2 = cars_after[i][0]
+
+        if x1 > x2:
+            temp = x2
+            x2 = x1
+            x1 = temp
+
+        region = ((x1 - max_dim, y - max_dim, t - dt), (x2 + max_dim - x1 + max_dim, 2 * max_dim, t + dt))
+
+        if lies_in_area(np.array(point)[[0, 1, 4]], region):
+            return True
+
     return False
 
 
-def is_collision_free(x, y, fixed_obstacles, dynamic_obstacles):
+def is_collision_free(x, y, fixed_obstacles, dynamic_obstacles, dt):
     if collision_cache.get(y, False):
         return False
 
@@ -92,23 +110,27 @@ def is_collision_free(x, y, fixed_obstacles, dynamic_obstacles):
         collision_cache[y] = True
         return False
 
-    if is_dynamic_obstacle_space(y, dynamic_obstacles):
+    if is_dynamic_obstacle_space(y, dynamic_obstacles, dt):
         collision_cache[y] = True
         return False
 
     return True
 
 
-def add_padding(obstacle_map):
+def grow_obstacle(obstacle_region):
     max_dim = np.max(CAR_AXIS)
+    (x, y, c, s, t), (x_range, y_range, c_range, s_range, t_range) = obstacle_region
+    x = x - max_dim
+    y = y - max_dim
+
+    x_range = x_range + 2 * max_dim
+    y_range = y_range + 2 * max_dim
+
+    return ((x, y, c, s, t), (x_range, y_range, c_range, y_range, t_range))
+
+
+def add_padding(obstacle_map):
     for key in obstacle_map.keys():
-        (x, y, c, s, t), (x_range, y_range, c_range, s_range, t_range) = obstacle_map[key]
-        x = x - max_dim
-        y = y - max_dim
-
-        x_range = x_range + 2 * max_dim
-        y_range = y_range + 2 * max_dim
-
-        obstacle_map[key] = ((x, y, c, s, t), (x_range, y_range, c_range, y_range, t_range))
+        obstacle_map[key] = grow_obstacle(obstacle_map[key])
 
     return obstacle_map

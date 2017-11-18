@@ -36,7 +36,7 @@ def apply_rrt_nh(space_region, starting_state, target_region, fixed_obstacles, d
             continue
 
         # check if path between(m_g,m_new) defined by motion-model is collision free
-        is_free = is_collision_free(m_g, m_new, fixed_obstacles, dynamic_obstacles)
+        is_free = is_collision_free(m_g, m_new, fixed_obstacles, dynamic_obstacles, dt)
 
         # if path is free, add new node to tree
         if is_free:

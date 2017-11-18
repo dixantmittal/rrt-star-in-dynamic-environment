@@ -40,7 +40,7 @@ dynamic_obstacles = {}
 # build dynamic obstacle map
 for car_pos in moving_obstacles.values():
     for x, y, d, t in car_pos:
-        t = round(t, 1)
+        t = np.round(t, 1)
         if dynamic_obstacles.get(t) is None:
             dynamic_obstacles[t] = [(x, y, d)]
         else:
@@ -59,9 +59,8 @@ if __name__ == '__main__':
                                                         fixed_obstacles={**fixed_obstacles, **lane_restrictions},
                                                         dynamic_obstacles=dynamic_obstacles,
                                                         dt=0.2,
-                                                        n_samples=5000,
-                                                        granularity=10000000)
-    print('total time taken: ', datetime.now() - t)
+                                                        n_samples=10000)
+    print('total computation time taken: ', datetime.now() - t)
 
     fig = plt.figure()
     ax = fig.add_subplot(111, aspect='equal')
@@ -89,10 +88,12 @@ if __name__ == '__main__':
     plt.plot(nodes[:, 0], nodes[:, 1], 'bo', ms=1, label='Sampled Points')
 
     if rrt_nh_final_state is not None:
+        print('total travel time taken: ', rrt_nh_final_state[4])
         path = nx.shortest_path(rrt_nh, start, rrt_nh_final_state)
         plt.plot(np.array(path)[:, 0], np.array(path)[:, 1], 'k-', ms=5, label='Returned Path')
 
         # print controls
+        print('Controls: (velocity, steering angle)')
         for i in range(len(path) - 1):
             print(controls[(path[i], path[i + 1])])
 
