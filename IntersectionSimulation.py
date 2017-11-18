@@ -1,17 +1,19 @@
 import numpy as np
 import pickle
 from datetime import datetime
-from rrt_nh import *
+from rrt_non_holonomic import *
 from parameters import *
+from math import *
 
 space_dims = (100, 100)
 car_dims = (4, 2)
 car_axis = (2, 1)
 
-# state is defined by 4 variables (x,y,theta,t)
+# NOTE: state is defined by 5 variables (x,y,cos(theta),sin(theta),t)
+
+# set ranges for variables
 x_range = (0, space_dims[0])
 y_range = (0, space_dims[1])
-theta_range = (0, 2 * np.pi)
 t_range = (0, 200)
 
 # set targets
@@ -31,6 +33,13 @@ fixed_obstacles = {
     'right_top_curb': ((60, 65, 0, 0), (40, 35, 360, t_range[1])),
 }
 
+lane_restrictions = {
+    'wrong_lane_1': ((40, 0, 0, 0), (10, 35, 360, t_range[1])),
+    'wrong_lane_2': ((0, 35, 0, 0), (40, 14, 360, t_range[1])),
+    'wrong_lane_3': ((60, 51, 0, 0), (40, 14, 360, t_range[1])),
+    'wrong_lane_4': ((40, 65, 0, 0), (10, 35, 360, t_range[1]))
+}
+
 moving_obstacles = pickle.load(open('cars.pkl', 'rb'))
 
 if __name__ == '__main__':
@@ -43,9 +52,10 @@ if __name__ == '__main__':
     rrt_nh, rrt_nh_final_state = apply_rrt_nh(space_region=space_region,
                                               starting_state=start,
                                               target_region=target[TURN],
-                                              obstacle_map=fixed_obstacles,  # {**fixed_obstacles, **moving_obstacles},
-                                              dt=0.05,
-                                              n_samples=3000,
+                                              obstacle_map={**fixed_obstacles, **lane_restrictions},
+                                              # {**fixed_obstacles, **moving_obstacles},
+                                              dt=0.5,
+                                              n_samples=5000,
                                               granularity=0.1)
     print('total time taken: ', datetime.now() - t)
 

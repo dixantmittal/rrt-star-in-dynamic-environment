@@ -2,7 +2,7 @@
 CAR_LENGTH = 5
 
 ACCELERATION_RANGE = (-20, 10)
-VELOCITY_RANGE = (-20, 20)
+VELOCITY_RANGE = (-5, 10)
 
 # steering angle (left_max,right_max)
 STEERING_RANGE = (45, 45)

@@ -26,8 +26,8 @@ def apply_rrt_nh(space_region, starting_state, target_region, obstacle_map, gran
         m_g, random_point = select_node_to_expand(tree, space_region)
 
         # sample a new point
-        m_new = sample_new_point_with_control(m_g, dt, velocity_and_steering_angle,
-                                              generate_using_velocity_and_steering_angle)
+        m_new, controls = sample_new_point_with_control(m_g, dt, velocity_and_steering_angle,
+                                                        generate_using_velocity_and_steering_angle)
 
         # check if m_new lies in space_region
         if not lies_in_area(m_new, space_region):
@@ -45,6 +45,7 @@ def apply_rrt_nh(space_region, starting_state, target_region, obstacle_map, gran
                     final_state = m_new
                     if not find_optimal:
                         break
+                    break
                 else:
                     # if new final state has shorter cost, set it as final state
                     cost = nx.shortest_path_length(tree, starting_state, m_new)

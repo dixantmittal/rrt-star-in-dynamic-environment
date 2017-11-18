@@ -86,7 +86,6 @@ def is_collision_free(x, y, obstacle_map, granularity):
     d = np.asscalar(cartesian_distance(x, y))
     unit_vector = (y - x) / d
     floor = int(np.floor(d / granularity))
-
     for i in range(floor):
         _m = x + i * granularity * unit_vector
 

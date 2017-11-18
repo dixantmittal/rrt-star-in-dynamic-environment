@@ -3,7 +3,6 @@ from utils import *
 from parameters import *
 
 
-
 def get_random_obstacle(space_region):
     space_origin, space_range = space_region
     n_dim = len(space_origin)
