@@ -16,6 +16,8 @@ def apply_rrt_nh(space_region, starting_state, target_region, obstacle_map, gran
 
     min_cost = None
 
+    controls = {}
+
     # TODO
     # > expand obstacles for car
     # > add padding for velocity
@@ -26,8 +28,8 @@ def apply_rrt_nh(space_region, starting_state, target_region, obstacle_map, gran
         m_g, random_point = select_node_to_expand(tree, space_region)
 
         # sample a new point
-        m_new, controls = sample_new_point_with_control(m_g, dt, velocity_and_steering_angle,
-                                                        generate_using_velocity_and_steering_angle)
+        m_new, u = sample_new_point_with_control(m_g, dt, velocity_and_steering_angle,
+                                                 generate_using_velocity_and_steering_angle)
 
         # check if m_new lies in space_region
         if not lies_in_area(m_new, space_region):
@@ -39,6 +41,7 @@ def apply_rrt_nh(space_region, starting_state, target_region, obstacle_map, gran
         # if path is free, add new node to tree
         if is_free:
             tree.add_weighted_edges_from([(m_g, m_new, cartesian_distance(m_g, m_new))])
+            controls[(m_g, m_new)] = u
             if lies_in_area(m_new, target_region):
                 print('Target reached at i:', i)
                 if min_cost is None:
@@ -55,4 +58,4 @@ def apply_rrt_nh(space_region, starting_state, target_region, obstacle_map, gran
 
     if final_state is None:
         print("Target not reached.")
-    return tree, final_state
+    return tree, final_state, controls

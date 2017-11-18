@@ -8,11 +8,13 @@ def select_node_to_expand(tree, state_space):
     n_dim = len(space_origin)
 
     # sample a random point in the space
-    random_point = np.random.rand(n_dim) * space_range
+    random_point = np.random.rand(2) * space_range[0:2]
+    theta = np.random.rand() * 2 * np.pi
+    random_point = np.hstack((random_point, (np.cos(theta), np.sin(theta))))
 
-    # calculate the distance from random point to all nodes
+    # calculate the distance from random point to all nodes, excluding time dimension
     nodes = list(tree.nodes())
-    d = cartesian_distance(nodes, random_point)
+    d = cartesian_distance(np.array(nodes)[:, 0:4], random_point)
 
     # return the node with shortest distance
     return nodes[np.argmin(d)], random_point
