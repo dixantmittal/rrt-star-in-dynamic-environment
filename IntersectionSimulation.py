@@ -91,7 +91,7 @@ if __name__ == '__main__':
     plt.plot(nodes[:, 0], nodes[:, 1], 'bo', ms=1, label='Sampled Points')
 
     if rrt_nh_final_state is not None:
-        print('total travel time taken: ', rrt_nh_final_state[4])
+        print('total travel time taken: ', round(rrt_nh_final_state[4], 1))
         path = nx.shortest_path(rrt_nh, start, rrt_nh_final_state)
         plt.plot(np.array(path)[:, 0], np.array(path)[:, 1], 'k-', ms=5, label='Returned Path')
 

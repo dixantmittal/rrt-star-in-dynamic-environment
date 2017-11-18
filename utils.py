@@ -81,11 +81,11 @@ def is_dynamic_obstacle_space(point, obstacle_map, dt):
 
     t = point[4]
 
-    cars_before = obstacle_map[np.round(t - dt, 1)]
-    cars_after = obstacle_map[np.round(t + dt, 1)]
+    cars_before = obstacle_map.get(round(t - dt, 1), [])
+    cars_after = obstacle_map.get(round(t + dt, 1), [])
 
     # for simplicity, we will take position of car at t-dt,t,d+dt and treat complete area as obstacle
-    for i in range(len(cars_before)):
+    for i in range(len(cars_after)):
         x1, y, theta = cars_before[i]
         x2 = cars_after[i][0]
 

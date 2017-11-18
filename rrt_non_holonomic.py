@@ -18,9 +18,6 @@ def apply_rrt_nh(space_region, starting_state, target_region, fixed_obstacles, d
 
     controls = {}
 
-    # TODO
-    # > expand obstacles for car
-    # > add padding for velocity
     fixed_obstacles = add_padding(fixed_obstacles)
 
     for i in tqdm(range((n_samples))):
@@ -56,6 +53,9 @@ def apply_rrt_nh(space_region, starting_state, target_region, fixed_obstacles, d
                         final_state = m_new
                         min_cost = cost
 
+    # Print n_collided
+    collided = len(collision_cache.values())
+    print('Collided: ', collided, '(', round(collided * 100 / i, 2), '% )')
     if final_state is None:
         print("Target not reached.")
     return tree, final_state, controls

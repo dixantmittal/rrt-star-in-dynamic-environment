@@ -8,46 +8,29 @@ steer_left_max, steer_right_max = STEERING_RANGE
 
 # for velocity
 POSSIBLE_V = np.arange(v_max - v_min + 1) + v_min  # v_max, v_min are inclusive
-# extreme velocities are favoured
-# v_bias = possible_v ** 4
-# uniform
-# v_bias = np.ones(possible_v.shape)
+
 # forward velocities are favoured
-V_BIAS = np.arange(POSSIBLE_V.shape[0]) ** 2 + 1
+V_BIAS = np.array(POSSIBLE_V)
+V_BIAS[V_BIAS < 1] = 1
 V_BIAS = V_BIAS / np.sum(V_BIAS)  # normalize
 
 # for steering angle
+POSSIBLE_STEER = -np.arange(steer_right_max + steer_left_max + 1) + steer_left_max
+
 if TURN == 'left':
-    POSSIBLE_STEER = np.arange(steer_left_max + 1)
-
-    # steer_bias = np.ones(int(np.ceil(len(possible_steer) / 2))) * 4
-    # steer_bias = np.hstack((steer_bias, np.ones(int(np.floor(len(possible_steer) / 2))) * 1))
-
-    # favours straight steering by squared factors
-    STEER_BIAS = np.flip(np.arange(POSSIBLE_STEER.shape[0]), axis=0) ** 2
-    STEER_BIAS = STEER_BIAS / np.sum(STEER_BIAS)
-
+    # favouring left steer with factor 2 to 3
+    STEER_BIAS = np.array(POSSIBLE_STEER)
 elif TURN == 'right':
-    POSSIBLE_STEER = -np.arange(steer_right_max + 1)
-
-    # uniform samplings
-    STEER_BIAS = np.ones(steer_right_max + 1)
-
-    # favours turning right bu squared factor
-    # steer_bias = np.arange(possible_steer.shape[0])
-
-    STEER_BIAS = STEER_BIAS / np.sum(STEER_BIAS)
-
+    # favouring right steer with factor 2 to 3
+    STEER_BIAS = np.array(-POSSIBLE_STEER)
 else:
-    POSSIBLE_STEER = -np.arange(steer_right_max + steer_left_max + 1) + steer_left_max
-
     # favouring central angles more
-    STEER_BIAS = 1 / (np.abs(POSSIBLE_STEER) + 0.5)
+    STEER_BIAS = 4 / (np.abs(POSSIBLE_STEER) + 0.1)
 
-    # favours turning right bu squared factor
-    # steer_bias = np.arange(possible_steer.shape[0])
-
-    STEER_BIAS = STEER_BIAS / np.sum(STEER_BIAS)
+STEER_BIAS[STEER_BIAS < 1] = 1
+STEER_BIAS = np.sqrt(STEER_BIAS)
+STEER_BIAS[STEER_BIAS > 3] = 3
+STEER_BIAS = STEER_BIAS / np.sum(STEER_BIAS)
 
 ####################------------------------------------------####################
 
