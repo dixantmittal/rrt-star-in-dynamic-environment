@@ -31,7 +31,7 @@ fixed_obstacles = {
     'right_top_curb': ((60, 65, 0, 0), (40, 35, 360, t_range[1])),
 }
 
-moving_obstacles = pickle.load(open('/Users/dixantmittal/Desktop/cars.pkl', 'rb'))
+moving_obstacles = pickle.load(open('cars.pkl', 'rb'))
 
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
@@ -46,7 +46,7 @@ if __name__ == '__main__':
                                               obstacle_map=fixed_obstacles,  # {**fixed_obstacles, **moving_obstacles},
                                               dt=0.05,
                                               n_samples=3000,
-                                              granularity=1)
+                                              granularity=0.1)
     print('total time taken: ', datetime.now() - t)
 
     fig = plt.figure()
@@ -67,7 +67,7 @@ if __name__ == '__main__':
         ax.add_patch(patch)
 
     # start state
-    patch = patches.Rectangle((start[0] - 1, start[1]), car_dims[1], car_dims[0], linewidth=1, edgecolor='g',
+    patch = patches.Rectangle((start[0] - 1, start[1]-2), car_dims[1], car_dims[0], linewidth=1, edgecolor='g',
                               facecolor='g')
     ax.add_patch(patch)
 
