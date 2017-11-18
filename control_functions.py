@@ -27,7 +27,7 @@ if TURN == 'left':
     STEER_BIAS = np.flip(np.arange(POSSIBLE_STEER.shape[0]), axis=0) ** 2
     STEER_BIAS = STEER_BIAS / np.sum(STEER_BIAS)
 
-else:
+elif TURN == 'right':
     POSSIBLE_STEER = -np.arange(steer_right_max + 1)
 
     # uniform samplings
@@ -38,6 +38,16 @@ else:
 
     STEER_BIAS = STEER_BIAS / np.sum(STEER_BIAS)
 
+else:
+    POSSIBLE_STEER = -np.arange(steer_right_max + steer_left_max + 1) + steer_left_max
+
+    # favouring central angles more
+    STEER_BIAS = 1 / (np.abs(POSSIBLE_STEER) + 0.5)
+
+    # favours turning right bu squared factor
+    # steer_bias = np.arange(possible_steer.shape[0])
+
+    STEER_BIAS = STEER_BIAS / np.sum(STEER_BIAS)
 
 ####################------------------------------------------####################
 

@@ -14,7 +14,11 @@ target = {
         (10, 14, cos(pi - TARGET_OFFSET) - cos(pi), sin(pi - TARGET_OFFSET) - sin(pi + TARGET_OFFSET), T_RANGE[1])),
     'right': (
         (60, 35, cos(TARGET_OFFSET), sin(-TARGET_OFFSET), T_RANGE[0]),
-        (10, 14, cos(0) - cos(TARGET_OFFSET), sin(TARGET_OFFSET) - sin(-TARGET_OFFSET), T_RANGE[1]))
+        (10, 14, cos(0) - cos(TARGET_OFFSET), sin(TARGET_OFFSET) - sin(-TARGET_OFFSET), T_RANGE[1])),
+    'straight': (
+        (50, 65, cos(pi / 2 + TARGET_OFFSET), sin(pi / 2 + TARGET_OFFSET), T_RANGE[0]),
+        (10, 10, cos(pi / 2 - TARGET_OFFSET) - cos(pi / 2 + TARGET_OFFSET), sin(pi / 2) - sin(pi / 2 + TARGET_OFFSET),
+         T_RANGE[1]))
 }
 
 start = (55, 20, 0, 1, 0)
@@ -70,7 +74,7 @@ if __name__ == '__main__':
         ax.add_patch(patch)
 
     for car in moving_obstacles.values():
-        patch = patches.Rectangle(car[10, 0:2] - 1, CAR_DIMS[0], CAR_DIMS[1], linewidth=1, edgecolor='r', facecolor='r')
+        patch = patches.Rectangle(car[60, 0:2] - 1, CAR_DIMS[0], CAR_DIMS[1], linewidth=1, edgecolor='r', facecolor='r')
         ax.add_patch(patch)
 
     # target region

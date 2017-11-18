@@ -26,4 +26,4 @@ T_RANGE = (0, 200)
 # difference in desired orientation allowed for target
 TARGET_OFFSET = radians(5)
 
-TURN = 'left'
+TURN = 'straight'
