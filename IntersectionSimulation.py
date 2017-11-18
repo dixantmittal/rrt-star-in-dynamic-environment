@@ -78,10 +78,9 @@ if __name__ == '__main__':
         ax.add_patch(patch)
 
     # target region
-    for tgt in target.values():
-        patch = patches.Rectangle((tgt[0][0], tgt[0][1]), tgt[1][0], tgt[1][1], linewidth=1, edgecolor='g',
-                                  facecolor='w')
-        ax.add_patch(patch)
+    tgt = target[TURN]
+    patch = patches.Rectangle((tgt[0][0], tgt[0][1]), tgt[1][0], tgt[1][1], linewidth=1, edgecolor='g', facecolor='w')
+    ax.add_patch(patch)
 
     # start state
     patch = patches.Rectangle((start[0] - 1, start[1] - 2), CAR_DIMS[1], CAR_DIMS[0], linewidth=1, edgecolor='g',
