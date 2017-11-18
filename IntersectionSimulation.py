@@ -13,9 +13,8 @@ target = {
         (30, 51, cos(pi), sin(pi + TARGET_OFFSET), T_RANGE[0]),
         (10, 14, cos(pi - TARGET_OFFSET) - cos(pi), sin(pi - TARGET_OFFSET) - sin(pi + TARGET_OFFSET), T_RANGE[1])),
     'right': (
-        (60, 35, cos(TARGET_OFFSET), sin(radians(-TARGET_OFFSET)), T_RANGE[0]),
-        (10, 14, cos(0) - cos(TARGET_OFFSET), sin(TARGET_OFFSET) - sin(-TARGET_OFFSET),
-         T_RANGE[1]))
+        (60, 35, cos(TARGET_OFFSET), sin(-TARGET_OFFSET), T_RANGE[0]),
+        (10, 14, cos(0) - cos(TARGET_OFFSET), sin(TARGET_OFFSET) - sin(-TARGET_OFFSET), T_RANGE[1]))
 }
 
 start = (55, 20, 0, 1, 0)
