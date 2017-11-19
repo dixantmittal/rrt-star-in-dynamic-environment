@@ -1,7 +1,7 @@
 from math import *
 
 # car length in meters
-CAR_LENGTH = 5
+CAR_LENGTH = 4
 
 ACCELERATION_RANGE = (-20, 10)
 VELOCITY_RANGE = (-5, 10)

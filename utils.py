@@ -1,5 +1,4 @@
-import numpy as np
-from parameters import *
+from state_generators import *
 
 volume_of_unit_ball = {
     1: 2,
@@ -21,13 +20,13 @@ free_space_cache = {}
 
 def get_free_area(space_region, obstacle_map):
     _, space_range = space_region
-    l, b = space_range
+    l, b, c, s, t = space_range
     space_area = l * b
 
     obstacle_area = 0
     for obstacle in obstacle_map.values():
         _, obstacle_range = obstacle
-        l, b = obstacle_range
+        l, b, c, s, t = obstacle_range
         obstacle_area += l * b
 
     return space_area - obstacle_area
@@ -45,9 +44,17 @@ def lies_in_area(point, area):
 
 def nearest_neighbours(nodes, center, radius):
     nodes = np.asarray(nodes)
-    d = cartesian_distance(nodes, center)
+    center = np.asarray(center)
+    d = cartesian_distance(nodes[:, :2], center[:2])
     nearest_nodes = nodes[d < radius]
     return tuple(map(tuple, nearest_nodes))
+
+
+def metric_distance(x, y):
+    x = np.array(x)[:2]
+    y = np.array(y)[:2]
+
+    return cartesian_distance(x, y)
 
 
 def cartesian_distance(x, y):
@@ -102,20 +109,23 @@ def is_dynamic_obstacle_space(point, obstacle_map, dt):
     return False
 
 
-def is_collision_free(x, y, fixed_obstacles, dynamic_obstacles, dt):
-    if collision_cache.get(y, False):
-        return False
+def is_collision_free(x, y, fixed_obstacles, dynamic_obstacles, dt, controls=None):
+    t_diff = y[4] - x[4]
 
-    if is_fixed_obstacle_space(y, fixed_obstacles):
-        collision_cache[y] = True
-        return False
+    for i in range(int(round(t_diff, 1) / dt)):
+        x = new_state_with_v_psi(x, controls[i], dt)
 
-    if is_dynamic_obstacle_space(y, dynamic_obstacles, dt):
-        collision_cache[y] = True
-        return False
+        if collision_cache.get(x, False):
+            return False
 
+        if is_fixed_obstacle_space(x, fixed_obstacles):
+            collision_cache[x] = True
+            return False
+
+        if is_dynamic_obstacle_space(x, dynamic_obstacles, dt):
+            collision_cache[x] = True
+            return False
     return True
-
 
 def grow_obstacle(obstacle_region):
     max_dim = np.max(CAR_AXIS)
@@ -126,7 +136,7 @@ def grow_obstacle(obstacle_region):
     x_range = x_range + 2 * max_dim
     y_range = y_range + 2 * max_dim
 
-    return ((x, y, c, s, t), (x_range, y_range, c_range, y_range, t_range))
+    return ((x, y, c, s, t), (x_range, y_range, c_range, s_range, t_range))
 
 
 def add_padding(obstacle_map):

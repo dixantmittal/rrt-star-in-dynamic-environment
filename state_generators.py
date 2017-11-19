@@ -4,7 +4,7 @@ from math import *
 
 
 # NOTE: theta and psi angles are required to be in radians
-def generate_using_velocity_and_steering_angle(current_state, control, dt):
+def new_state_with_v_psi(current_state, control, dt):
     x, y, cos_theta, sin_theta, t = current_state
     v, psi = control
 

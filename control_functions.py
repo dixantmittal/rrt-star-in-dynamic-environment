@@ -1,4 +1,5 @@
 import numpy as np
+
 from parameters import *
 
 ####################-------------INITIALIZATION-------------####################
@@ -49,3 +50,37 @@ def sample_velocity():
 
 def sample_steering_angle():
     return np.random.choice(POSSIBLE_STEER, p=STEER_BIAS)
+
+
+def find_controls(m_g, m_new, dt):
+    x1, y1, c1, s1, t1 = m_g
+    x2, y2, c2, s2, t2 = m_new
+    theta1 = atan2(s1, c1)
+    theta2 = atan2(s2, c2)
+
+    dtheta = theta2 - theta1
+    dx = x2 - x1
+    dy = y2 - y1
+    delta_t = t2 - t1
+
+    if delta_t < 0:
+        return None
+
+    v = dx / (delta_t * c1 + 1e-10)
+
+    if not v_min <= v <= v_max:
+        return None
+
+    steer_max, steer_min = STEERING_RANGE
+    steer_min = cos(-steer_min)
+    steer_max = cos(steer_max)
+
+    steer_range = max(steer_max, steer_min)
+
+    psi = atan2(dtheta * CAR_LENGTH * c1, dx)
+    if cos(psi) < steer_range:
+        return None
+
+    u = np.ones((int(round(delta_t, 1) / dt), 2))
+    u = u * [v, psi]
+    return list(map(tuple, u))
