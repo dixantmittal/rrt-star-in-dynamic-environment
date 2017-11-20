@@ -42,7 +42,7 @@ def apply_rrt_star_nh(state_space, starting_state, target_region, fixed_obstacle
             continue
 
         # find k nearest neighbours
-        radius = np.minimum(np.power(gamma / volume_of_unit_ball[n_dim] * np.log(i + 1) / (i + 1),
+        radius = np.minimum(np.power(gamma / volume_of_unit_ball[2] * np.log(i + 1) / (i + 1),
                                      1 / n_dim), VELOCITY_RANGE[1] * dt)
 
         m_near = nearest_neighbours(list(tree.nodes), m_new, radius=radius)
@@ -97,14 +97,14 @@ def apply_rrt_star_nh(state_space, starting_state, target_region, fixed_obstacle
             # if cost is less than current cost, that means m_new to m_g could be a potential link
             if c < cost[m_g]:
 
-                u = find_controls(m_g, m_new, dt)
+                u = find_controls(m_new, m_g, dt)
 
                 # if control is not feasible
                 if u is None:
                     continue
 
                 # check if path between(m_g,m_new) is collision free
-                if not is_collision_free(m_g, m_new, fixed_obstacles, dynamic_obstacles, dt, u):
+                if not is_collision_free(m_new, m_g, fixed_obstacles, dynamic_obstacles, dt, u):
                     continue
 
                 tree.remove_edge(list(tree.predecessors(m_g))[0], m_g)

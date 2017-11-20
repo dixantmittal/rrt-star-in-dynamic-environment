@@ -63,12 +63,12 @@ def find_controls(m_g, m_new, dt):
     dy = y2 - y1
     delta_t = t2 - t1
 
-    if delta_t < 0:
+    if delta_t <= 0:
         return None
 
     v = dx / (delta_t * c1 + 1e-10)
 
-    if not v_min <= v <= v_max:
+    if not v_min <= v <= v_max or v < 0:
         return None
 
     steer_max, steer_min = STEERING_RANGE
@@ -82,5 +82,5 @@ def find_controls(m_g, m_new, dt):
         return None
 
     u = np.ones((int(round(delta_t, 1) / dt), 2))
-    u = u * [v, psi]
+    u = u * [v, degrees(psi)]
     return list(map(tuple, u))
