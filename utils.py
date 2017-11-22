@@ -110,8 +110,6 @@ def is_dynamic_obstacle_space(point, obstacle_map, dt):
 
 
 def is_collision_free(x, y, fixed_obstacles, dynamic_obstacles, dt, controls=None):
-    t_diff = y[4] - x[4]
-
     for i in range(len(controls)):
         x = new_state_with_v_psi(x, controls[i], dt)
 

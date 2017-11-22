@@ -36,25 +36,22 @@ def apply_rrt_nh(state_space, starting_state, target_region, fixed_obstacles, dy
             continue
 
         # if path is free, add new node to tree
-        tree.add_weighted_edges_from([(m_g, m_new, cartesian_distance(np.array(m_g)[:2], np.array(m_new)[:2]))])
+        tree.add_weighted_edges_from([(m_g, m_new, metric_distance(m_g, m_new))])
         controls[(m_g, m_new)] = u
         if lies_in_area(m_new, target_region):
             print('Target reached at i:', i)
-            if min_cost is None:
+            if final_state is None:
                 final_state = m_new
+                min_cost = nx.dijkstra_path_length(tree, starting_state, m_new)
                 if not find_optimal:
                     break
-                    # break
             else:
                 # if new final state has shorter cost, set it as final state
-                cost = nx.shortest_path_length(tree, starting_state, m_new)
+                cost = nx.dijkstra_path_length(tree, starting_state, m_new)
                 if cost < min_cost:
                     final_state = m_new
                     min_cost = cost
 
-    # Print n_collided
-    collided = len(collision_cache.values())
-    print('Collided: ', collided, '(', round(collided * 100 / i, 2), '% )')
     if final_state is None:
         print("Target not reached.")
     return tree, final_state, controls

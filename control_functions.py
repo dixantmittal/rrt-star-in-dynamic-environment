@@ -4,6 +4,8 @@ from parameters import *
 
 ####################-------------INITIALIZATION-------------####################
 # init one time initialized common variables to improve speed while running
+from state_generators import new_state_with_v_psi
+
 v_min, v_max = VELOCITY_RANGE
 steer_left_max, steer_right_max = STEERING_RANGE
 
@@ -52,35 +54,43 @@ def sample_steering_angle():
     return np.random.choice(POSSIBLE_STEER, p=STEER_BIAS)
 
 
-def find_controls(m_g, m_new, dt):
-    x1, y1, c1, s1, t1 = m_g
-    x2, y2, c2, s2, t2 = m_new
-    theta1 = atan2(s1, c1)
-    theta2 = atan2(s2, c2)
+def find_controls(_from, _to, dt):
+    x1, y1, c1, s1, t1 = _from
+    x2, y2, c2, s2, t2 = _to
+    u = []
+    for i in range(int(round(t2 - t1, 1) / dt)):
+        x1, y1, c1, s1, t1 = _from
+        x2, y2, c2, s2, t2 = _to
 
-    dtheta = theta2 - theta1
-    dx = x2 - x1
-    dy = y2 - y1
-    delta_t = t2 - t1
+        theta1 = atan2(s1, c1)
+        theta2 = atan2(s2, c2)
 
-    if delta_t <= 0:
+        dtheta = theta2 - theta1
+        dx = x2 - x1
+        dy = y2 - y1
+        delta_t = t2 - t1
+
+        if delta_t <= 0:
+            return None
+
+        v = dx / (delta_t * c1 + 1e-10)
+
+        if not v_min <= v <= v_max or v < 0:
+            return None
+
+        steer_max, steer_min = STEERING_RANGE
+        steer_min = cos(-steer_min)
+        steer_max = cos(steer_max)
+
+        steer_range = max(steer_max, steer_min)
+
+        psi = atan2(dtheta * CAR_LENGTH * c1, dx)
+        if cos(psi) < steer_range:
+            return None
+        control = (v, degrees(psi))
+        u.append(control)
+        _from = new_state_with_v_psi(_from, control, dt)
+
+    if len(u) == 0:
         return None
-
-    v = dx / (delta_t * c1 + 1e-10)
-
-    if not v_min <= v <= v_max or v < 0:
-        return None
-
-    steer_max, steer_min = STEERING_RANGE
-    steer_min = cos(-steer_min)
-    steer_max = cos(steer_max)
-
-    steer_range = max(steer_max, steer_min)
-
-    psi = atan2(dtheta * CAR_LENGTH * c1, dx)
-    if cos(psi) < steer_range:
-        return None
-
-    u = np.ones((int(round(delta_t, 1) / dt), 2))
-    u = u * [v, degrees(psi)]
-    return list(map(tuple, u))
+    return u

@@ -25,7 +25,12 @@ def apply_rrt_star_nh(state_space, starting_state, target_region, fixed_obstacle
 
     fixed_obstacles = add_padding(fixed_obstacles)
 
-    for i in tqdm(range((n_samples))):
+    for i in tqdm(range(n_samples)):
+
+        # update cost cache
+        if i % 500 == 0:
+            cost = nx.single_source_dijkstra_path_length(tree, starting_state)
+
         # select node to expand
         m_g, random_point = select_node_to_expand(tree, state_space)
 
@@ -37,7 +42,7 @@ def apply_rrt_star_nh(state_space, starting_state, target_region, fixed_obstacle
         if not lies_in_area(m_new, state_space):
             continue
 
-        # # check if path between(m_g,m_new) defined by motion-model is collision free
+        # check if path between(m_g,m_new) defined by motion-model is collision free
         if not is_collision_free(m_g, m_new, fixed_obstacles, dynamic_obstacles, dt, [u]):
             continue
 
@@ -79,14 +84,19 @@ def apply_rrt_star_nh(state_space, starting_state, target_region, fixed_obstacle
 
         m_g = min_cost_node
         for n in range(len(min_cost_u)):
-            m_new = new_state_with_v_psi(m_g, min_cost_u[n], dt)
-            d = metric_distance(m_g, m_new)
-            tree.add_weighted_edges_from([(m_g, m_new, d)])
-            controls[(m_g, m_new)] = min_cost_u[n]
-            cost[m_new] = cost[m_g] + d
-            m_g = m_new
+            # due to minute difference in final states, it is better to force last state as actual final state
+            # force last node to be actual target node.
+            if n == len(min_cost_u) - 1:
+                m_inter = m_new
+            else:
+                m_inter = new_state_with_v_psi(m_g, min_cost_u[n], dt)
 
-        m_near = nearest_neighbours(list(tree.nodes), m_new, radius=radius)
+            d = metric_distance(m_g, m_inter)
+            tree.add_weighted_edges_from([(m_g, m_inter, d)])
+            controls[(m_g, m_inter)] = min_cost_u[n]
+            cost[m_inter] = cost[m_g] + d
+            m_g = m_inter
+
         # update m_new's neighbours for paths through m_new
         for m_g in m_near:
 
@@ -108,21 +118,28 @@ def apply_rrt_star_nh(state_space, starting_state, target_region, fixed_obstacle
                     continue
 
                 tree.remove_edge(list(tree.predecessors(m_g))[0], m_g)
-                tree.add_weighted_edges_from([(m_new, m_g, d)])
-                cost[m_g] = c
-                controls[(m_new, m_g)] = u
+                m_inter1 = m_new
+                for n in range(len(u)):
+                    if n == len(u) - 1:
+                        m_inter2 = m_g
+                    else:
+                        m_inter2 = new_state_with_v_psi(m_inter1, u[n], dt)
+
+                    d = metric_distance(m_inter1, m_inter2)
+                    tree.add_weighted_edges_from([(m_inter1, m_inter2, d)])
+                    controls[(m_inter1, m_inter2)] = u[n]
+                    cost[m_inter2] = cost[m_inter1] + d
+                    m_inter1 = m_inter2
 
         # if target is reached, return the tree and final state
         if lies_in_area(m_new, target_region):
+            cost = nx.single_source_dijkstra_path_length(tree, starting_state)
             print('Target reached at i:', i)
             if final_state is None:
                 final_state = m_new
             elif cost[m_new] < cost[final_state]:
                 final_state = m_new
 
-    # Print n_collided
-    collided = len(collision_cache.values())
-    print('Collided: ', collided, '(', round(collided * 100 / i, 2), '% )')
     if final_state is None:
         print("Target not reached.")
     return tree, final_state, controls

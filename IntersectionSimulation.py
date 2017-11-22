@@ -59,7 +59,7 @@ if __name__ == '__main__':
                                                              target_region=target[TURN],
                                                              fixed_obstacles={**fixed_obstacles, **lane_restrictions},
                                                              dynamic_obstacles=dynamic_obstacles,
-                                                             dt=0.5,
+                                                             dt=0.1,
                                                              n_samples=5000)
     print('total computation time taken: ', datetime.now() - t)
 
@@ -84,24 +84,19 @@ if __name__ == '__main__':
                               facecolor='g')
     ax.add_patch(patch)
 
-    edges = list(rrt_nh.edges)
-    for edge in edges:
-        edge = np.array(edge).transpose()
-        plt.plot(edge[0], edge[1], 'c-', edge[0], edge[1], 'bo', ms=1)
-    # nodes = np.asarray(list(rrt_nh.nodes))
-    # plt.plot(nodes[:, 0], nodes[:, 1], 'bo', ms=1, label='Sampled Points')
+    # edges = list(rrt_nh.edges)
+    # for edge in edges:
+    #     edge = np.array(edge).transpose()
+    #     plt.plot(edge[0], edge[1], 'c-', edge[0], edge[1], 'bo', ms=1)
+    nodes = np.asarray(list(rrt_nh.nodes))
+    plt.plot(nodes[:, 0], nodes[:, 1], 'yo', ms=1, label='Sampled Points')
 
     if rrt_nh_final_state is not None:
         print('total travel time: ', round(rrt_nh_final_state[4], 1))
-        print('shortest path length: ', nx.shortest_path_length(rrt_nh, start, rrt_nh_final_state))
-        path = nx.shortest_path(rrt_nh, start, rrt_nh_final_state)
+        print('shortest path length: ', nx.dijkstra_path_length(rrt_nh, start, rrt_nh_final_state))
+        path = nx.dijkstra_path(rrt_nh, start, rrt_nh_final_state)
         plt.plot(np.array(path)[:, 0], np.array(path)[:, 1], 'k-', ms=5, label='Returned Path')
-
-        # print controls
-        print('Controls: (velocity, steering angle)')
         print('Path length:', len(path))
-        for i in range(len(path) - 1):
-            print(controls[(path[i], path[i + 1])])
 
     plt.ylim(Y_RANGE)
     plt.xlim(X_RANGE)
